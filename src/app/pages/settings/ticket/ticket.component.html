@@ -1,0 +1,873 @@
+<div class="mb-5">
+    <p-toast />
+    <p-confirmdialog />
+    <div class="pt-4">
+        <div class="flex flex-wrap justify-end gap-3">
+            <p-button *ngIf="viewMode === 'preview' && (isShowTab && (isSubUser || !isSubUser))" icon="pi pi-check-square" label="Choose this Template" severity="info" (click)="applyTheme($event)" variant="outlined"></p-button>
+
+            <p-button *ngIf="viewMode === 'live' && (isShowTab && (isSubUser || !isSubUser))" (onClick)="openSegmentModal()" icon="pi pi-file-edit" label="New Segment" severity="primary" variant="outlined"></p-button>
+
+            <p-button *ngIf="viewMode === 'live' && (isShowTab && (isSubUser || !isSubUser))" (onClick)="openEditModal()" icon="pi pi-pen-to-square" label="Edit Ticket Price" severity="info" variant="outlined"></p-button>
+
+            <p-button *ngIf="viewMode === 'live' && (isShowTab && (isSubUser || !isSubUser))" (onClick)="showExtraServiceModal()" [icon]="hadExtraService ? 'pi pi-pen-to-square' : 'pi pi-plus'" [label]="hadExtraService ? 'Edit Extra Service' : 'Add Extra Service'" severity="warn" variant="outlined"></p-button>
+
+            <p-button *ngIf="viewMode === 'live' && ticketData?.Paxlist.length > 1 && (isShowTab && (isSubUser || !isSubUser))" icon="pi pi-clone" label="Pax Wise Ticket" (onClick)="openSplitTicketModal()" severity="help" variant="outlined"></p-button>
+
+            <p-button (onClick)="toggleFareInfo()" [icon]="isShowFare ? 'pi pi-eye-slash' : 'pi pi-eye'" [label]="isShowFare ? 'Hide Ticket Price' : 'Show Ticket Price'" severity="warn" variant="outlined"> </p-button>
+
+            <p-button icon="pi pi-file-pdf" (onClick)="downloadAsPdf()" label="Download as PDF" severity="primary" variant="outlined"></p-button>
+
+            <p-button icon="pi pi-file-word" (onClick)="downloadAsDoc()" label="Download as Docs" severity="secondary" variant="outlined" styleClass="ml-2"> </p-button>
+
+            <!-- <p-button icon="pi pi-envelope" (onClick)="openEmailDialogue()" label="Send Email" severity="success" variant="outlined"></p-button> -->
+
+            <button ngxPrint [printSectionId]="'ticket-content'" class="p-button p-component p-button-outlined p-button-secondary">
+                <span class="pi pi-print p-button-icon"></span>
+                <span class="p-button-label">Print Ticket</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (template === '1') {
+    <app-ticket-one [isShowFare]="isShowFare"></app-ticket-one>
+}
+
+@if (template === '2') {
+    <app-ticket-two [isShowFare]="isShowFare"></app-ticket-two>
+}
+
+@if (template === '3') {
+    <app-ticket-three [isShowFare]="isShowFare"></app-ticket-three>
+}
+
+<!-- <app-ticket-two [isShowFare]="isShowFare"></app-ticket-two> -->
+
+<p-dialog [(visible)]="showEditFareDialogue" [style]="{ width: '100%', maxWidth: '1100px' }" header="Edit Ticket Price" [modal]="true" [breakpoints]="{ '960px': '95vw', '640px': '100vw' }">
+    <ng-template #content>
+        <div *ngFor="let passenger of editPriceModel; let i = index" class="mb-6 border p-4 rounded-xl shadow-md">
+            <h3 class="font-bold text-lg mb-4">
+                {{ passenger.PaxType === 'ADT' ? 'Adult' : passenger.PaxType === 'INF' ? 'Infant' : 'Children' }}
+                (Per Passenger)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <!-- Service Charge -->
+                <div>
+                    <label class="block font-bold mb-2"> Base Price </label>
+                    <p-inputNumber [min]="0" (onInput)="calculatePrices(passenger)" [(ngModel)]="passenger.BaseFare" locale="en-US" class="w-full" />
+                </div>
+                <div>
+                    <label class="block font-bold mb-2"> Tax </label>
+                    <p-inputNumber [min]="0" (onInput)="calculatePrices(passenger)" [(ngModel)]="passenger.Tax" locale="en-US" class="w-full" />
+                </div>
+                <div>
+                    <label class="block font-bold mb-2"> Service Charge </label>
+                    <p-inputNumber [min]="0" (onInput)="calculatePrices(passenger)" [(ngModel)]="passenger.ServiceCharge" locale="en-US" class="w-full" />
+                </div>
+
+                <!-- Discount -->
+
+                <div>
+                    <label class="block font-bold mb-2">Discount Type</label>
+                    <p-select [disabled]="i !== 0" (onChange)="prepareFareModel()" [options]="priceType" [(ngModel)]="fareType" class="w-full" />
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">Discount ({{ fareType }})</label>
+                    <p-inputNumber [min]="0" [max]="getMax()" [(ngModel)]="passenger.Discount" (onInput)="calculatePrices(passenger)" locale="en-US" class="w-full" />
+                </div>
+
+                <!-- Total Price -->
+                <div>
+                    <label class="block font-bold mb-2">Total Price</label>
+                    <p-inputNumber [disabled]="true" [readonly]="true" [(ngModel)]="passenger.TotalFare" locale="en-US" class="w-full" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Summary Table -->
+        <div class="mb-6 border p-4 rounded-xl shadow-md bg-white overflow-auto">
+            <h3 class="text-xl font-semibold mb-4">Price Summary</h3>
+
+            <p-table [value]="editPriceModel" class="min-w-[600px]">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Pax Type</th>
+                        <th>Base Fare</th>
+                        <th>Tax</th>
+                        <!-- <th>AIT</th> -->
+                        <th>Service Charge</th>
+                        <th>Discount</th>
+                        <th>No. Of Pax</th>
+                        <th>Total</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-prices>
+                    <tr>
+                        <td>
+                            {{ prices.PaxType === 'ADT' ? 'Adult' : prices.PaxType === 'INF' ? 'Infant' : 'Children' }}
+                        </td>
+                        <td align="center">{{ prices.BaseFare }}</td>
+                        <td>{{ prices.Tax | number: '1.0-0' }}</td>
+                        <!-- <td>{{ prices.AIT | number: '1.0-0' }}</td> -->
+                        <td>
+                            {{ prices.ServiceCharge | number: '1.0-0' }}
+                        </td>
+                        <td>
+                            {{ prices.Discount | number: '1.0-0' }}
+                            {{ fareType == 'Percent' ? '(%)' : '' }}
+                        </td>
+                        <td>{{ prices.NoOfPax }}</td>
+                        <td>
+                            {{ (prices.editedBase + prices.Tax + prices.ServiceCharge) * prices.NoOfPax | number: '1.0-0' }}
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="footer">
+                    <tr class="bg-gray-50">
+                        <td colspan="6" class="text-right pr-4">
+                            <span class="font-semibold text-sm text-gray-700">AIT & VAT</span>
+                        </td>
+                        <td class="font-semibold text-gray-800">
+                            {{ grandTotalAfterEdit * 0.003 | number: '1.0-0' }}
+                        </td>
+                    </tr>
+                    <tr class="bg-gray-50" *ngIf="ticketData?.FareBrakeDown?.ExtraService > 0">
+                        <td colspan="6" class="text-right pr-4">
+                            <span class="font-semibold text-sm text-gray-700">Extra Service</span>
+                        </td>
+                        <td class="font-semibold text-gray-800">
+                            {{ ticketData?.FareBrakeDown?.ExtraService | number: '1.0-0' }}
+                        </td>
+                    </tr>
+                    <tr class="bg-blue-50">
+                        <td colspan="6" class="text-right pr-4 text-xl font-bold text-gray-900">Grand Total</td>
+                        <td class="text-xl font-bold text-blue-600">
+                            {{ grandTotalAfterEdit + ticketData?.FareBrakeDown?.ExtraService + grandTotalAfterEdit * 0.003 | number: '1.0-0' }}
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Save" icon="pi pi-check" (click)="submitEditPrice()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="emailDialog" [style]="{ width: '100%', maxWidth: '500px' }" header="Send Email" [modal]="true" [breakpoints]="{ '960px': '95vw', '640px': '100vw' }" [closable]="false">
+    <ng-template #content>
+        <div class="p-fluid">
+            <div class="field mb-4">
+                <label for="subject" class="block font-bold mb-2">Subject</label>
+                <input id="subject" type="text" pInputText [(ngModel)]="emailSubject" placeholder="Enter email subject" />
+            </div>
+
+            <div class="field mb-4">
+                <label for="email" class="block font-bold mb-2">Email</label>
+                <input id="email" type="email" pInputText [(ngModel)]="emailAddress" placeholder="Enter recipient's email" />
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideEmailDialog()" />
+        <p-button label="Send" icon="pi pi-envelope" (click)="sendEmail()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showExtraServiceDialogue" [style]="{ width: '100%', maxWidth: '1100px' }" [header]="dialogHeader" [modal]="true" [breakpoints]="{ '960px': '95vw', '640px': '100vw' }" [closable]="true">
+    <ng-template #content>
+        <div class="mb-6 border p-4 rounded-xl shadow-md">
+            <p-stepper [(value)]="currentStep">
+                <p-step-list>
+                    <p-step [value]="1">Wheel Chair</p-step>
+                    <p-step [value]="2">Baggage</p-step>
+                    <p-step [value]="3">Meal</p-step>
+                    <p-step [value]="4">Seats</p-step>
+                </p-step-list>
+
+                <p-step-panels>
+                    <!-- Step 1 -->
+                    <p-step-panel [value]="1">
+                        <ng-template #content let-activateCallback="activateCallback">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div *ngFor="let item of extraServices" class="border p-4 rounded-xl shadow-md">
+                                    <p class="text-lg font-semibold text-gray-800 mb-4">{{ item.PassengerName }}</p>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <p-checkbox [(ngModel)]="item.IsWheelchairIncluded" inputId="wheelchair_{{ item.PassengerName }}" binary="true" styleClass="p-checkbox-lg"> </p-checkbox>
+                                            <label for="wheelchair_{{ item.PassengerName }}" class="font-medium text-gray-700">
+                                                {{
+                                                    item.IsWheelchairIncluded
+                                                        ? 'Wheelchair Included'
+                                                        : 'Wheelchair Not
+                                                Included'
+                                                }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex pt-6 justify-end">
+                                <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)"></p-button>
+                            </div>
+                        </ng-template>
+                    </p-step-panel>
+
+                    <!-- Step 2 -->
+                    <p-step-panel [value]="2">
+                        <ng-template #content let-activateCallback="activateCallback">
+                            <div class="mb-6 border p-4 rounded-xl shadow-md" *ngFor="let item of extraServices">
+                                <h3 class="font-bold text-lg mb-4">Add Baggage for - {{ item.PassengerName }}</h3>
+
+                                <div
+                                    class="grid grid-cols-1 gap-6"
+                                    [ngClass]="{
+                                        'md:grid-cols-2': item?.ExtraBaggages?.length + 1 === 2,
+                                        'md:grid-cols-3': item?.ExtraBaggages?.length + 1 === 3,
+                                        'md:grid-cols-4': item?.ExtraBaggages?.length + 1 === 4,
+                                        'md:grid-cols-5': item?.ExtraBaggages?.length + 1 === 5,
+                                        'md:grid-cols-6': item?.ExtraBaggages?.length + 1 === 6
+                                    }"
+                                >
+                                    <div *ngFor="let baggage of item?.ExtraBaggages">
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700" for="{{ item.PassengerName }}_{{ baggage.Trip }}">
+                                                {{ baggage.Trip }}
+                                            </label>
+                                            <div class="ml-2">
+                                                <p-checkbox
+                                                    (onChange)="changeExtraServiceBaggage($event, baggage, item)"
+                                                    [(ngModel)]="baggage.IsOpen"
+                                                    binary="true"
+                                                    inputId="{{ item.PassengerName }}_{{ baggage.Trip }}"
+                                                    pTooltip="Add baggage for {{ baggage.Trip }}"
+                                                    tooltipPosition="top"
+                                                >
+                                                </p-checkbox>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <input [(ngModel)]="baggage.BaggageAllowance" [disabled]="!baggage.IsOpen" pInputText class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="Example: 10 KG" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700">Total Baggage Price</label>
+                                        </div>
+                                        <p-inputNumber [(ngModel)]="item.TotalBaggagePrice" [min]="0" locale="en-US" class="w-full" inputStyleClass="w-full border border-gray-300 rounded-md p-2 text-sm"> </p-inputNumber>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex pt-6 justify-between">
+                                <p-button label="Back" severity="secondary" icon="pi pi-arrow-left" iconPos="left" (onClick)="activateCallback(1)"></p-button>
+                                <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)"></p-button>
+                            </div>
+                        </ng-template>
+                    </p-step-panel>
+
+                    <!-- Step 3 -->
+                    <p-step-panel [value]="3">
+                        <ng-template #content let-activateCallback="activateCallback">
+                            <div class="mb-6 border p-4 rounded-xl shadow-md" *ngFor="let item of extraServices">
+                                <h3 class="font-bold text-lg mb-4">Add Meal For - {{ item.PassengerName }}</h3>
+
+                                <div
+                                    class="grid grid-cols-1 gap-6"
+                                    [ngClass]="{
+                                        'md:grid-cols-2': item?.ExtraMeal?.length + 1 === 2,
+                                        'md:grid-cols-3': item?.ExtraMeal?.length + 1 === 3,
+                                        'md:grid-cols-4': item?.ExtraMeal?.length + 1 === 4,
+                                        'md:grid-cols-5': item?.ExtraMeal?.length + 1 === 5
+                                    }"
+                                >
+                                    <div *ngFor="let meal of item?.ExtraMeal">
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700" for="{{ item.PassengerName }}_{{ meal.Trip }}">
+                                                {{ meal.Trip }}
+                                            </label>
+                                            <div class="ml-2">
+                                                <p-checkbox
+                                                    (onChange)="changeExtraServiceMeal($event, meal, item)"
+                                                    [(ngModel)]="meal.IsOpen"
+                                                    binary="true"
+                                                    inputId="{{ item.PassengerName }}_{{ meal.Trip }}"
+                                                    pTooltip="Add Meal for {{ meal.Trip }}"
+                                                    tooltipPosition="top"
+                                                >
+                                                </p-checkbox>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <input [(ngModel)]="meal.MealType" [disabled]="!meal.IsOpen" pInputText class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="Example: M" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700">Total Meal Price</label>
+                                        </div>
+                                        <p-inputNumber [(ngModel)]="item.TotalMealPrice" [min]="0" locale="en-US" class="w-full" inputStyleClass="w-full border border-gray-300 rounded-md p-2 text-sm"> </p-inputNumber>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex pt-6 justify-between">
+                                <p-button label="Back" icon="pi pi-arrow-left" iconPos="left" (onClick)="activateCallback(2)"></p-button>
+                                <p-button label="Next" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(4)"></p-button>
+                            </div>
+                        </ng-template>
+                    </p-step-panel>
+
+                    <!-- Step 4 -->
+                    <p-step-panel [value]="4">
+                        <ng-template #content let-activateCallback="activateCallback">
+                            <div class="mb-6 border p-4 rounded-xl shadow-md" *ngFor="let item of extraServices">
+                                <h3 class="font-bold text-lg mb-4">Add Seat For - {{ item.PassengerName }}</h3>
+
+                                <div
+                                    class="grid grid-cols-1 gap-6"
+                                    [ngClass]="{
+                                        'md:grid-cols-2': item?.ExtraSeat?.length + 1 === 2,
+                                        'md:grid-cols-3': item?.ExtraSeat?.length + 1 === 3,
+                                        'md:grid-cols-4': item?.ExtraSeat?.length + 1 === 4,
+                                        'md:grid-cols-5': item?.ExtraSeat?.length + 1 === 5
+                                    }"
+                                >
+                                    <div *ngFor="let seat of item?.ExtraSeat">
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700" for="{{ item.PassengerName }}_{{ seat.Trip }}">
+                                                {{ seat.Trip }}
+                                            </label>
+                                            <div class="ml-2">
+                                                <p-checkbox
+                                                    (onChange)="changeExtraServiceSeat($event, seat, item)"
+                                                    [(ngModel)]="seat.IsOpen"
+                                                    binary="true"
+                                                    inputId="{{ item.PassengerName }}_{{ seat.Trip }}"
+                                                    pTooltip="Add Seat for {{ seat.Trip }}"
+                                                    tooltipPosition="top"
+                                                >
+                                                </p-checkbox>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <input [(ngModel)]="seat.SeatNo" [disabled]="!seat.IsOpen" pInputText class="w-full border border-gray-300 rounded-md p-2 text-sm" placeholder="Example: 1A" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <label class="text-sm font-medium text-gray-700">Total Seat Price</label>
+                                        </div>
+                                        <p-inputNumber [(ngModel)]="item.TotalSeatPrice" [min]="0" locale="en-US" class="w-full" inputStyleClass="w-full border border-gray-300 rounded-md p-2 text-sm"> </p-inputNumber>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex pt-6 justify-start">
+                                <p-button label="Back" icon="pi pi-arrow-left" iconPos="left" (onClick)="activateCallback(3)"></p-button>
+                            </div>
+                        </ng-template>
+                    </p-step-panel>
+                </p-step-panels>
+            </p-stepper>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideExtraServiceModal()" />
+        <p-button label="Save" icon="pi pi-check" (click)="submitExtraService()" />
+    </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showSplitTicketModal" [style]="{ width: '100%', maxWidth: '650px' }" header="Select Passenger" [modal]="true" [breakpoints]="{ '960px': '95vw', '640px': '100vw' }" class="rounded-2xl shadow-lg">
+    <ng-template #content>
+        <div class="p-4 space-y-5">
+            <p-message
+                severity="info"
+                icon="pi pi-info-circle"
+                *ngIf="ticketData.FareBrakeDown?.PaxFareBreakdown?.length > 1"
+                text="An adult passenger must be included when viewing tickets for infants or children individually."
+                class="w-full"
+            ></p-message>
+
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <div
+                    *ngFor="let passenger of ticketData?.Paxlist; let i = index"
+                    class="flex flex-col gap-2 p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border"
+                    [ngClass]="{
+                        'bg-blue-50 border-blue-400 ring-2 ring-blue-400 shadow-lg': passenger.IsSplitted,
+                        'bg-gray-50 hover:bg-gray-100': !passenger.IsSplitted
+                    }"
+                >
+                    <!-- Passenger Row -->
+                    <div class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-100" (click)="toggleSplit(passenger)">
+                        <p-checkbox [binary]="true" [(ngModel)]="passenger.IsSplitted" [disabled]="isChildOrInfant(passenger) && !isAdultSelected()" (click)="$event.stopPropagation()" (onChange)="onSelectionChange()"></p-checkbox>
+
+                        <div>
+                            <p class="font-semibold text-gray-800">
+                                {{ passenger.PassengerName || 'Passenger ' + (i + 1) }} - {{ passenger.TicketNo }} ({{ passenger.PaxType === 'ADT' ? 'Adult' : passenger.PaxType === 'INF' ? 'Infant' : 'Children' }})
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Fare Options -->
+                    <div *ngIf="(passenger.PaxType === 'CNN' || passenger.PaxType === 'CHD') && passenger?.IsSplitted && childFares.length > 1" class="ml-8 mt-2 space-y-2">
+                        <p class="text-sm font-medium text-gray-700">Choose Fare:</p>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-2" *ngFor="let childFare of childFares; let i = index">
+                                <p-radioButton inputId="fare{{ i + 1 }}" name="fareOption" [value]="'Fare' + (i + 1)" [(ngModel)]="passenger.ChooseFare"> </p-radioButton>
+
+                                <label for="fare{{ i + 1 }}" class="text-sm text-gray-700"> Fare - {{ i + 1 }} (BDT {{ childFare?.TotalFare }}) </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <div class="flex justify-end p-3">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" (click)="showSplitTicketModal = false" class="px-4"></p-button>
+
+            <p-button label="View Ticket" icon="pi pi-window-maximize" (click)="splitSelectedPassengers()" severity="primary" class="px-4"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    [(visible)]="showSegmentModal"
+    [style]="{ width: '100%', maxWidth: '1100px' }"
+    header="{{ segmentMode === 'create' ? 'Add New Segment' : segmentMode === 'edit' ? 'Update Segment' : 'Segment List' }}"
+    [modal]="true"
+    [breakpoints]="{ '960px': '95vw', '640px': '100vw' }"
+    class="rounded-2xl shadow-2xl"
+>
+    <ng-container *ngIf="isEditMode">
+        <ng-template #content>
+            <!-- <div class="border p-4 rounded-2xl bg-white shadow-md mb-6"
+                *ngIf="ticketData?.TravelDetials?.JournyType !== 'MULTI CITY'">
+                <label class="block font-bold mb-2">Select Trip Type</label>
+                <div class="flex gap-6">
+                    <div class="flex items-center gap-2">
+                        <p-radioButton name="tripType" inputId="onward" [value]="1"
+                            [(ngModel)]="singleSegment.SegmentType">
+                        </p-radioButton>
+                        <label for="onward" class="block font-bold mb-2">Onward</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <p-radioButton name="tripType" inputId="return" [value]="2"
+                            [(ngModel)]="singleSegment.SegmentType">
+                        </p-radioButton>
+                        <label for="return" class="block font-bold mb-2">Return</label>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="space-y-6">
+                <!-- Segment Info Block -->
+                <div class="border p-6 rounded-2xl bg-white shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block font-bold mb-2" for="origin">Departure Airport <span style="color: red">*</span></label>
+                            <p-autoComplete
+                                [(ngModel)]="singleSegment.OriginAirPortName"
+                                [forceSelection]="true"
+                                [suggestions]="airportList"
+                                (completeMethod)="searchCity($event.query)"
+                                optionLabel="name"
+                                field="name"
+                                [showClear]="true"
+                                [autoHighlight]="true"
+                                placeholder="Type Departure Airport Name"
+                                class="w-full"
+                            />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.OriginAirPortName && hasError">Departure airport is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="destination">Arrival Airport <span style="color: red">*</span></label>
+                            <p-autoComplete
+                                [(ngModel)]="singleSegment.ArrivalAirPortName"
+                                [forceSelection]="true"
+                                [suggestions]="airportList"
+                                (completeMethod)="searchCity($event.query)"
+                                optionLabel="name"
+                                field="name"
+                                [showClear]="true"
+                                [autoHighlight]="true"
+                                placeholder="Type Arrival Airport Name"
+                                class="w-full"
+                            />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.ArrivalAirPortName && hasError">Arrival airport is required!</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block font-bold mb-2" for="departure-date">Departure Date & Time <span style="color: red">*</span></label>
+                            <p-datepicker
+                                appendTo="body"
+                                [showButtonBar]="true"
+                                showIcon="true"
+                                inputId="departure-date"
+                                [(ngModel)]="singleSegment.DepartureDate"
+                                [showTime]="true"
+                                placeholder="Select Date Time"
+                                [hourFormat]="'24'"
+                                dateFormat="D, dd M yy"
+                            />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.DepartureDate && hasError">Departure date is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="arrival-date">Arrival Date & Time <span style="color: red">*</span></label>
+                            <p-datepicker
+                                [minDate]="minSelectableDate"
+                                appendTo="body"
+                                [showButtonBar]="true"
+                                showIcon="true"
+                                inputId="arrival-date"
+                                [(ngModel)]="singleSegment.ArrivalDate"
+                                [showTime]="true"
+                                placeholder="Select Date Time"
+                                [hourFormat]="'24'"
+                                dateFormat="D, dd M yy"
+                            />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.ArrivalDate && hasError">Arrival date is required!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flight Info Block -->
+                <div class="border p-6 rounded-2xl bg-white shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block font-bold mb-2" for="departure-terminal">Departure Terminal</label>
+                            <input pInputText id="departure-terminal" placeholder="Example: TERMINAL 1" [(ngModel)]="singleSegment.OriginTerminal" autocomplete="off" />
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="arrival-terminal">Arrival Terminal</label>
+                            <input pInputText id="arrival-terminal" placeholder="Example: TERMINAL 2" [(ngModel)]="singleSegment.ArrivalTerminal" autocomplete="off" />
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="carrier-code">Airline Name <span style="color: red">*</span></label>
+
+                            <p-autoComplete
+                                [(ngModel)]="singleSegment.CarrierCode"
+                                [forceSelection]="true"
+                                [suggestions]="airlines"
+                                (completeMethod)="searchAirline($event.query)"
+                                optionLabel="name"
+                                field="name"
+                                [showClear]="true"
+                                [autoHighlight]="true"
+                                placeholder="Type Airline Name"
+                                class="w-full"
+                            >
+                                <ng-template let-airline pTemplate="item">
+                                    <div class="flex items-center gap-2">
+                                        <img [src]="getSafeUrl(airLogos[airline.code].png)" alt="{{ airline.name }}" class="w-6 h-6 rounded-full object-contain border" />
+                                        <span class="truncate">{{ airline.name }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.CarrierCode && hasError">Airline name is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="carrier-code">Airline PNR <span style="color: red">*</span></label>
+                            <input pInputText id="carrier-code" placeholder="Example: 9Z7LFA" [(ngModel)]="singleSegment.ConfirmationNo" autocomplete="off" />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.ConfirmationNo && hasError">Airline PNR is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="flight-number">Flight Number <span style="color: red">*</span></label>
+                            <input pInputText id="flight-number" placeholder="Example: 641" [(ngModel)]="singleSegment.FlightNumber" autocomplete="off" />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.FlightNumber && hasError">Flight number is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="booking-code">Booking Code <span style="color: red">*</span></label>
+                            <input pInputText id="booking-code" placeholder="Example: G" [(ngModel)]="singleSegment.BookingClass" autocomplete="off" />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.BookingClass && hasError">Booking code is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="aircraft">Aircraft</label>
+                            <input pInputText id="aircraft" placeholder="Example: BOEING 787-8" [(ngModel)]="singleSegment.AirCraft" autocomplete="off" />
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="cabin-classs">Cabin Class <span style="color: red">*</span></label>
+                            <input pInputText id="cabin-classs" placeholder="Example: Y" [(ngModel)]="singleSegment.CabinClass" autocomplete="off" />
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.CabinClass && hasError">Cabin class is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2">Cabin Class Type <span style="color: red">*</span></label>
+                            <p-select class="w-full" appendTo="body" [options]="classTypes" [(ngModel)]="singleSegment.CabinTypeName" optionLabel="name" [filter]="true" filterBy="name" [showClear]="true" placeholder="Select Class Type">
+                                <ng-template #selectedItem let-selectedOption>
+                                    <div class="flex items-center gap-2">
+                                        <div>{{ selectedOption.name }}</div>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-class #item>
+                                    <div class="flex items-center gap-2">
+                                        <div>{{ class.name }}</div>
+                                    </div>
+                                </ng-template>
+                            </p-select>
+
+                            <p class="text-danger mt-1 flex items-center gap-1" *ngIf="!singleSegment.CabinTypeName && hasError">Cabin class type is required!</p>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for="cabin-baggage">Cabin Baggage (KG)</label>
+                            <p-inputnumber class="w-full" id="cabin-baggage" placeholder="Example: 7" [(ngModel)]="singleSegment.CabinBaggageAllowance" autocomplete="off" />
+                        </div>
+
+                        <div>
+                            <label class="block font-bold mb-2" for=" checkin-baggage">Check In Baggage</label>
+                            <p-inputnumber id="checkin-baggage" placeholder="Example: 25" [(ngModel)]="singleSegment.AirBaggageAllowance" class="w-full" autocomplete="off" />
+                        </div>
+
+                        <div class="baggage-type">
+                            <label class="block font-bold mb-2" for=" checkin-baggage">Check In Baggage Type</label>
+                            <p-select appendTo="body" [options]="baggageUnits" [(ngModel)]="singleSegment.AirBaggageUnit" optionLabel="label" optionValue="value" dropdownIcon="pi pi-angle-down" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <div class="flex justify-end gap-3 px-6 pb-4 pt-3 border-t">
+                <p-button label="Back To List" icon="pi pi-arrow-left" severity="secondary" (click)="isEditMode = false; segmentMode = 'list'" styleClass="rounded-xl px-5 py-2 font-medium shadow-sm"></p-button>
+
+                <p-button
+                    [label]="segmentMode === 'create' ? 'Add Segment' : 'Update Segment'"
+                    [icon]="segmentMode === 'create' ? 'pi pi-plus' : 'pi pi-pen-to-square'"
+                    severity="primary"
+                    (click)="addSegment()"
+                    styleClass="rounded-xl px-5 py-2 font-medium shadow-md"
+                >
+                </p-button>
+            </div>
+        </ng-template>
+    </ng-container>
+
+    <ng-container *ngIf="!isEditMode">
+        <p-table [value]="ticketData?.TravelDetials?.OnwardSegmentList" [scrollable]="true" [rows]="50" [showGridlines]="true" stripedRows>
+            <ng-template #caption>
+                <div class="flex items-center justify-between px-2 bg-gray-50 rounded-t-2xl">
+                    <h3 class="text-xl font-semibold text-gray-800 m-0">
+                        Onward Segments <span class="text-red-600">{{ onwardRoute }}</span>
+                    </h3>
+                </div>
+            </ng-template>
+
+            <ng-template #header>
+                <tr>
+                    <th style="min-width: 12rem">Carrier</th>
+                    <th style="min-width: 10rem">From</th>
+                    <th style="min-width: 10rem">To</th>
+                    <th style="min-width: 10rem">Departure</th>
+                    <th style="min-width: 10rem">Arrival</th>
+                    <th style="min-width: 10rem">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-segment>
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <img [src]="getSafeUrl(airLogos[segment.CarrierCode].png)" style="width: 48px" class="rounded" />
+                            <span style="font-weight: 500">{{ segment.CarrierName }}</span>
+                        </div>
+                    </td>
+                    <td style="font-weight: 500">
+                        <div [innerHTML]="segment.OriginAirPortName"></div>
+                    </td>
+                    <td style="font-weight: 500">
+                        <div [innerHTML]="segment.ArrivalAirPortName"></div>
+                    </td>
+                    <td style="font-weight: 500">{{ segment.DepartureDate | date: 'EEE, dd MMM yyyy, h:mm a' }}</td>
+                    <td style="font-weight: 500">{{ segment.ArrivalDate | date: 'EEE, dd MMM yyyy, h:mm a' }}</td>
+                    <td style="font-weight: 500">
+                        <div class="flex justify-center items-center gap-2">
+                            <ng-container *ngIf="segment.IsManualEntry; else notManual">
+                                <div class="flex flex-col gap-2">
+                                    <!-- Update Button -->
+                                    <button
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="pi pi-pencil"
+                                        label="Update"
+                                        class="p-button-outlined p-button-sm text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
+                                        pTooltip="Update Segment"
+                                        tooltipPosition="top"
+                                        (click)="openEditItinerary(segment)"
+                                    ></button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="pi pi-trash"
+                                        label="Delete"
+                                        class="p-button-outlined p-button-sm text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                                        pTooltip="Delete Segment"
+                                        tooltipPosition="top"
+                                        (click)="handleDeleteSegment($event, segment)"
+                                    ></button>
+                                </div>
+                            </ng-container>
+
+                            <!-- Non-manual (Disabled) -->
+                            <ng-template #notManual>
+                                <button
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    icon="pi pi-ban"
+                                    label="Original"
+                                    class="p-button-outlined p-button-sm text-gray-400 border-gray-300 cursor-not-allowed"
+                                    pTooltip="Original Segment Can't be updated"
+                                    tooltipPosition="top"
+                                    disabled
+                                ></button>
+                            </ng-template>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <div>
+            <br />
+            <br />
+            <br />
+        </div>
+
+        <p-table [value]="ticketData?.TravelDetials?.ReturnSegmentList" [scrollable]="true" [rows]="50" [showGridlines]="true" stripedRows>
+            <ng-template #caption>
+                <div class="flex items-center justify-between px-2 bg-gray-50 rounded-t-2xl">
+                    <h3 class="text-xl font-semibold text-gray-800 m-0">
+                        Return Segments <span class="text-red-600">{{ returnRoute }}</span>
+                    </h3>
+
+                    <p-button label="Add New" icon="pi pi-plus" class="bg-blue-600 border-blue-600 hover:bg-blue-700 hover:border-blue-700 text-white font-medium rounded-lg shadow-md" styleClass="px-4 py-2" (click)="openAddItinerary()"> </p-button>
+                </div>
+
+                <div *ngIf="!ticketData?.TravelDetials?.ReturnSegmentList?.length" class="flex items-center justify-center p-6 mt-3 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-gray-600 shadow-sm mb-4">
+                    <i class="pi pi-info-circle text-blue-500 text-xl mr-2"></i>
+                    <span class="text-base font-medium">No Return Segment Available</span>
+                </div>
+            </ng-template>
+
+            <!-- No Return Segment Message -->
+
+            <ng-template #header>
+                <tr *ngIf="ticketData?.TravelDetials?.ReturnSegmentList?.length">
+                    <th style="min-width: 12rem">Carrier</th>
+                    <th style="min-width: 10rem">From</th>
+                    <th style="min-width: 10rem">To</th>
+                    <th style="min-width: 10rem">Departure</th>
+                    <th style="min-width: 10rem">Arrival</th>
+                    <th style="min-width: 10rem">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-segment>
+                <tr>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            <img [src]="getSafeUrl(airLogos[segment.CarrierCode].png)" style="width: 48px" class="rounded" />
+                            <span style="font-weight: 500">{{ segment.CarrierName }}</span>
+                        </div>
+                    </td>
+                    <td style="font-weight: 500">
+                        <div [innerHTML]="segment.OriginAirPortName"></div>
+                    </td>
+                    <td style="font-weight: 500">
+                        <div [innerHTML]="segment.ArrivalAirPortName"></div>
+                    </td>
+                    <td style="font-weight: 500">{{ segment.DepartureDate | date: 'EEE, dd MMM yyyy, h:mm a' }}</td>
+                    <td style="font-weight: 500">{{ segment.ArrivalDate | date: 'EEE, dd MMM yyyy, h:mm a' }}</td>
+
+                    <td style="font-weight: 500">
+                        <div class="flex justify-center items-center gap-2">
+                            <ng-container *ngIf="segment.IsManualEntry; else notManual">
+                                <div class="flex flex-col gap-2">
+                                    <!-- Update Button -->
+                                    <button
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="pi pi-pencil"
+                                        label="Update"
+                                        class="p-button-outlined p-button-sm text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white"
+                                        pTooltip="Update Segment"
+                                        tooltipPosition="top"
+                                        (click)="openEditItinerary(segment)"
+                                    ></button>
+
+                                    <!-- Delete Button -->
+                                    <button
+                                        pButton
+                                        pRipple
+                                        type="button"
+                                        icon="pi pi-trash"
+                                        label="Delete"
+                                        class="p-button-outlined p-button-sm text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                                        pTooltip="Delete Segment"
+                                        tooltipPosition="top"
+                                        (click)="handleDeleteSegment($event, segment)"
+                                    ></button>
+                                </div>
+                            </ng-container>
+
+                            <!-- Non-manual (Disabled) -->
+                            <ng-template #notManual>
+                                <button
+                                    pButton
+                                    pRipple
+                                    type="button"
+                                    icon="pi pi-ban"
+                                    label="Original"
+                                    class="p-button-outlined p-button-sm text-gray-400 border-gray-300 cursor-not-allowed"
+                                    pTooltip="Original Segment Can't be updated"
+                                    tooltipPosition="top"
+                                    disabled
+                                ></button>
+                            </ng-template>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-container>
+</p-dialog>

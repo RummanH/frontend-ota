@@ -1,0 +1,124 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+@use './assets/layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './assets/demo/demo.scss';
+.p-password {
+    display: block;
+    width: 100%;
+}
+.p-inputtext {
+    width: 100%;
+}
+
+.p-datepicker {
+    width: 100%;
+}
+
+.p-autocomplete {
+    width: 100%;
+}
+
+.baggage-type .p-select {
+    width: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+.custom-auto-complete .p-autocomplete-input {
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 1.1rem;
+}
+
+.custom-datepicker .p-datepicker-input {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.p-accordionheader {
+    padding-bottom: 0 !important;
+}
+.p-drawer-top {
+    height: auto !important;
+}
+
+.card {
+    background-color: #fffdfd !important;
+}
+
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 350px) {
+    .container {
+        max-width: 400px;
+    }
+}
+
+@media (min-width: 480px) {
+    .container {
+        max-width: 480px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 880px;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1080px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1520px;
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1660px;
+    }
+}
+
+/* Your tab bar style stays unchanged */
+.card-flight-details .p-tablist-tab-list .p-tablist-active-bar {
+    background: #e50000 !important;
+}
+
+.text-danger {
+    color: red;
+    font-size: 10px;
+    animation: slideDown 0.3s ease-out;
+    width: 300px;
+    margin-top: 3px;
+    position: relative; /* Ensures transform works well */
+}
+
+/* Keyframes for slideDown animation */
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

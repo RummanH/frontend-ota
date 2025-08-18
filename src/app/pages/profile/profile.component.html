@@ -1,0 +1,196 @@
+<div class="mb-4" *ngIf="user() as loggedInUser">
+  <p-toast />
+  <!-- Profile Information Card -->
+
+  <div class="flex items-center card bg-white shadow-md rounded-xl p-4 space-x-4 mb-3">
+    <!-- Avatar Container -->
+    <div class="flex flex-col items-center w-[150px] flex-shrink-0">
+      <div class="relative w-full">
+        <img [src]="loggedInUser?.LogoFIlePath || 'assets/default-avatar.png'" alt="User Avatar" class="w-full h-full object-cover border border-gray-200 rounded-md" />
+        <input type="file" id="avatarUpload" class="hidden" (change)="onUpload($event, 'AttachmentFilePath')" />
+        <label for="avatarUpload" class="absolute bottom-2 right-2 bg-white border border-gray-300 rounded-full p-1 shadow hover:bg-gray-100 cursor-pointer">
+          <i class="pi pi-camera text-sm text-gray-600"></i>
+        </label>
+      </div>
+
+      <small class="block text-gray-500 mt-2 text-xs text-center"> Recommended: 150 × 37 px </small>
+    </div>
+
+    <!-- User Info -->
+    <div>
+      <h5 class="text-md font-semibold mb-1">
+        {{ loggedInUser?.AgencyName }}
+      </h5>
+      <p class="text-sm text-gray-600">{{ loggedInUser?.AgencyAddress }}</p>
+    </div>
+  </div>
+
+  <p-card>
+    <div class="flex flex-wrap gap-4 justify-between border-b-2">
+      <h2 class="text-xl font-semibold">Agency Information</h2>
+      <div class="flex items-center gap-2 mb-3">
+        <button (click)="showDialog()" class="font-bold flex items-center gap-2 bg-[#E50000] hover:bg-[#cc0000] text-white px-5 py-2 rounded-md transition shadow">
+          <i class="pi pi-pen-to-square"></i>
+          <span class="">Update Information</span>
+        </button>
+
+        <button *ngIf="!isSubUser" (click)="showChangePasswordModal()" class="font-bold flex items-center gap-2 bg-[#E50000] hover:bg-[#cc0000] text-white px-5 py-2 rounded-md transition shadow">
+          <i class="pi pi-pen-to-square"></i>
+          <span class="">Change Password</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">Name</p>
+        <p class="text-base font-semibold text-gray-800">{{ loggedInUser?.AgencyName || '-' }}</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">Email</p>
+        <p class="text-base font-semibold text-gray-800">{{ loggedInUser?.UserEmail || '-' }}</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">Phone</p>
+        <p class="text-base font-semibold text-gray-800">{{ loggedInUser?.UserPhone || '-' }}</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">Country</p>
+        <p class="text-base font-semibold text-gray-800">{{ loggedInUser?.AgencyCountryName || '-' }}</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">City</p>
+        <p class="text-base font-semibold text-gray-800">{{ loggedInUser?.AgencyCityName || '-' }}</p>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl shadow border">
+        <p class="text-sm text-gray-500 mb-1">Address</p>
+        <p class="text-base font-semibold text-gray-800 break-words">{{ loggedInUser?.AgencyAddress || '-' }}</p>
+      </div>
+    </div>
+  </p-card>
+
+  <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '90%', maxWidth: '700px' }" class="mx-auto">
+    <!-- Dialog Header -->
+    <ng-template #header>
+      <div class="flex items-center justify-center gap-2">
+        <span class="font-bold text-lg sm:text-xl">Update Agency Information</span>
+      </div>
+    </ng-template>
+
+    <!-- Form -->
+    <form [formGroup]="agencyForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 p-4 sm:p-6">
+      <!-- Country Select -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-select appendTo="body" inputId="selectCountry" formControlName="AgentCountry" [options]="countries" optionLabel="countryName" [filter]="true" filterBy="countryName" [showClear]="true" class="w-full" (onChange)="getCityList($event)">
+            <ng-template #selectedItem let-selectedOption>
+              <div class="flex items-center gap-2">
+                <span>{{ selectedOption.countryName }}</span>
+              </div>
+            </ng-template>
+            <ng-template let-country #item>
+              <div class="flex items-center gap-2">
+                <span>{{ country.countryName }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="selectCountry">Select a Country</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="agencyForm.get('AgentCountry')?.invalid && (agencyForm.get('AgentCountry')?.touched || agencyForm.get('AgentCountry')?.dirty)">Country is required.</div>
+      </div>
+
+      <!-- City Select -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-select appendTo="body" inputId="selectCity" formControlName="AgentCity" [options]="cities" optionLabel="cityName" [filter]="true" filterBy="cityName" [showClear]="true" class="w-full">
+            <ng-template #selectedItem let-selectedOption>
+              <div class="flex items-center gap-2">
+                <span>{{ selectedOption.cityName }}</span>
+              </div>
+            </ng-template>
+            <ng-template let-city #item>
+              <div class="flex items-center gap-2">
+                <span>{{ city.cityName }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+          <label for="selectCity">Select a City</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="agencyForm.get('AgentCity')?.invalid && (agencyForm.get('AgentCity')?.touched || agencyForm.get('AgentCity')?.dirty)">City is required.</div>
+      </div>
+
+      <!-- Agency Name -->
+      <div>
+        <p-floatlabel variant="on">
+          <input pInputText id="agencyName" formControlName="AgencyName" class="w-full" />
+          <label for="agencyName">Agency Name</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="agencyForm.get('AgencyName')?.invalid && (agencyForm.get('AgencyName')?.touched || agencyForm.get('AgencyName')?.dirty)">Agency Name is required.</div>
+      </div>
+
+      <!-- Agency Address -->
+      <div>
+        <p-floatlabel variant="on">
+          <input pInputText id="AgentAddress" formControlName="AgentAddress" class="w-full" />
+          <label for="AgentAddress">Agency Address</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="agencyForm.get('AgentAddress')?.invalid && (agencyForm.get('AgentAddress')?.touched || agencyForm.get('AgentAddress')?.dirty)">Agency Address is required.</div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="md:col-span-2 flex justify-end">
+        <p-button type="submit" label="Update Information" [icon]="formStatus === 'loading' ? 'pi pi-spin pi-spinner' : formStatus === 'success' ? 'pi pi-check' : ''" [loading]="formStatus === 'loading'" [disabled]="formStatus === 'loading' || agencyForm.invalid" class="w-full sm:w-auto mt-4"> </p-button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <p-dialog [(visible)]="changePasswordVisible" [modal]="true" [style]="{ width: '90%', maxWidth: '400px' }" class="mx-auto">
+    <!-- Dialog Header -->
+    <ng-template #header>
+      <div class="flex items-center justify-center gap-2">
+        <span class="font-bold text-lg sm:text-xl">Change Password</span>
+      </div>
+    </ng-template>
+
+    <!-- Form -->
+    <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()" class="grid gap-4 sm:gap-6 p-4 sm:p-6">
+      <!-- Current Password -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-password feedback="false" [toggleMask]="true" id="currentPassword" formControlName="currentPassword" class="w-full" />
+          <label for="currentPassword">Current Password</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="changePasswordForm.get('currentPassword')?.invalid && (changePasswordForm.get('currentPassword')?.touched || changePasswordForm.get('currentPassword')?.dirty)">Current password is required.</div>
+      </div>
+
+      <!-- New Password -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-password [toggleMask]="true" id="newPassword" formControlName="newPassword" class="w-full" />
+          <label for="newPassword">New Password</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="changePasswordForm.get('newPassword')?.invalid && (changePasswordForm.get('newPassword')?.touched || changePasswordForm.get('newPassword')?.dirty)">New password is required.</div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-password [toggleMask]="true" id="confirmPassword" formControlName="confirmPassword" class="w-full" />
+          <label for="confirmPassword">Confirm Password</label>
+        </p-floatlabel>
+        <div class="text-red-600 text-sm mt-1" *ngIf="changePasswordForm.get('confirmPassword')?.invalid && (changePasswordForm.get('confirmPassword')?.touched || changePasswordForm.get('confirmPassword')?.dirty)">Please confirm your new password.</div>
+        <div class="text-red-600 text-sm mt-1" *ngIf="passwordsDoNotMatch">Passwords do not match.</div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end">
+        <p-button type="submit" label="Change Password" [icon]="passwordFormStatus === 'loading' ? 'pi pi-spin pi-spinner' : passwordFormStatus === 'success' ? 'pi pi-check' : ''" [loading]="passwordFormStatus === 'loading'" [disabled]="changePasswordForm.invalid || passwordFormStatus === 'loading'" class="w-full sm:w-auto mt-4"> </p-button>
+      </div>
+    </form>
+  </p-dialog>
+</div>
