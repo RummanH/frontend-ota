@@ -15,9 +15,9 @@
       </div>
 
       <div>
-        <label for="phone" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone</label>
-        <input placeholder="017XXXXXXXXX" id="phone" type="tel" formControlName="phone" autocomplete="off" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
-        <small class="text-red-500 text-xs" *ngIf="registrationForm.get('phone')?.invalid && (registrationForm.get('phone')?.dirty || registrationForm.get('phone')?.touched)"> Please enter a valid phone number </small>
+        <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+        <input placeholder="017XXXXXXXXX" id="phoneNumber" type="tel" formControlName="phoneNumber" autocomplete="off" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+        <small class="text-red-500 text-xs" *ngIf="registrationForm.get('phoneNumber')?.invalid && (registrationForm.get('phoneNumber')?.dirty || registrationForm.get('phoneNumber')?.touched)"> Please enter a valid phone number </small>
       </div>
 
       <div>

@@ -2,7 +2,6 @@ import { computed, Injectable, signal } from '@angular/core';
 import { AllApiService } from './all-api.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Pagination } from '../../pages/retrieved-ticket/pagination.model';
 
 // user.model.ts
 export interface User {
@@ -98,7 +97,7 @@ export class AuthService {
   }
 
   getToken() {
-    let token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    let token = localStorage.getItem('accessToken');
     return token ? token : false;
   }
 
@@ -160,10 +159,6 @@ export class AuthService {
 
   getDashboardStats(): Observable<DashboardStats> {
     return this.httpclient.get<DashboardStats>(this.allapi.getDashboardStats);
-  }
-
-  getPaginatedResponse(pagination: Pagination) {
-    return this.httpclient.post(this.allapi.getPaginatedReports, pagination);
   }
 
   retrieveTicket(pnr: string | null, isReissueSearch: boolean = false) {

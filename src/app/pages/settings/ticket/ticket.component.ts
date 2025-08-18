@@ -26,7 +26,6 @@ import { AllApiService } from '../../../layout/service/all-api.service';
 import { TicketService } from '../../../layout/service/ticket.service';
 import { TicketOneComponent } from './views/ticket-one/ticket-one.component';
 import { TicketTwoComponent } from './views/ticket-two/ticket-two.component';
-import { previewTicketData } from '../../../contstants';
 import { StepperModule } from 'primeng/stepper';
 import { Checkbox, CheckboxChangeEvent } from 'primeng/checkbox';
 import { Tooltip } from 'primeng/tooltip';
@@ -720,7 +719,6 @@ export class TicketComponent implements OnInit {
     }
 
     if (this.viewMode === 'preview') {
-      this.ticketData = previewTicketData;
       this.getBaggageData();
       this.ticketService.setTicketData(this.ticketData);
     }

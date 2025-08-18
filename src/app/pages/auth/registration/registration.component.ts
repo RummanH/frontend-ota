@@ -27,7 +27,7 @@ export class RegistrationComponent {
   ngOnInit(): void {
     this.registrationForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
+      phoneNumber: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
@@ -37,7 +37,7 @@ export class RegistrationComponent {
 
     this.authService.registerUser(this.registrationForm.value).subscribe({
       next: (response: any) => {
-        if (response.success) {
+        if (response.status) {
           this.formStatus = 'success';
           this.registrationForm.reset();
           this.showMessage('success', 'Request Sent', 'Your registration request has been sent successfully.');

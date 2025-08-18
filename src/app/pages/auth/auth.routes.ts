@@ -8,5 +8,5 @@ export default [
   { path: 'login', component: LoginComponent },
   { path: 'registration', component: RegistrationComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password/:rcode', component: ResetPasswordComponent },
+  { path: 'reset-password/:code', component: ResetPasswordComponent },
 ] as Routes;

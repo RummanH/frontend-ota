@@ -1,7 +1,7 @@
 import { Component, effect, inject, Input } from '@angular/core';
 import { TicketService } from '../../../../../layout/service/ticket.service';
 import { CommonModule } from '@angular/common';
-import { AirportNameToCountryPipe } from '../../../../../_pipe/airport-name-to-country.pipe';
+import { AirportNameToCountryPipe } from '../../../../../common/pipes/airport-name-to-country.pipe';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import airlineLogos from 'airlogos';
 

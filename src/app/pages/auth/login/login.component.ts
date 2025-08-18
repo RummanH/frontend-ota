@@ -43,17 +43,18 @@ export class LoginComponent {
 
     const { password, email } = this.loginForm.value;
 
-    this.authService.login({ email: email?.toUpperCase().trim(), password: password.trim() }).subscribe({
+    this.authService.login({ email: email?.toLowerCase().trim(), password: password.trim() }).subscribe({
       next: (res) => {
-        if (res.success) {
+        if (res.status) {
           this.formStatus = 'success';
           this.showMessage('success', 'Login Successful', 'You have logged in successfully.');
+          localStorage.setItem('accessToken', res.payload.accessToken);
           setTimeout(() => {
             this.router.navigate(['/']);
           }, 500);
         } else {
           this.formStatus = 'idle';
-          this.showMessage('error', 'Login Failed', res.Message || 'Unable to log in. Please check your credentials and try again.');
+          this.showMessage('error', 'Login Failed', res.message || 'Unable to log in. Please check your credentials and try again.');
         }
       },
       error: (err) => {
