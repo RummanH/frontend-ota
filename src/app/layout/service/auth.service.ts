@@ -130,106 +130,16 @@ export class AuthService {
     return this.userSignal();
   }
 
-  loadUserFromServer() {
-    this.httpclient.get<User>(this.allapi.agentProfileView).subscribe({
-      next: (res: any) => this.setUser(res.Payload),
-      error: () => {
-        this.clearUser();
-      },
-    });
-  }
-
-  loadUserPermissions() {
-    this.httpclient
-      .get(this.allapi.getSubUserPermissions, {
-        params: { subUserId: 0 },
-      })
-      .subscribe((res: any) => {
-        if (res.Success) {
-          // this.setUser({ ...this.user(), ...res.Payload });
-        }
-      });
-  }
-
-  getPermission() {
-    return this.httpclient.get(this.allapi.getSubUserPermissions, {
-      params: { subUserId: 0 },
-    });
-  }
-
-  getDashboardStats(): Observable<DashboardStats> {
-    return this.httpclient.get<DashboardStats>(this.allapi.getDashboardStats);
-  }
-
-  retrieveTicket(pnr: string | null, isReissueSearch: boolean = false) {
-    return this.httpclient.post(this.allapi.retrieveTicket, { PNR: pnr, IsReissueSearch: isReissueSearch });
-  }
-
-  getTicketAfterRetrieve(pnr: string | null, isReissueSearch: boolean = false) {
-    return this.httpclient.post(this.allapi.getTicketAfterRetrieve, { PNR: pnr, IsReissueSearch: isReissueSearch });
-  }
-
-  editTicketPrice(requestModel: any) {
-    return this.httpclient.post(this.allapi.editTicketPrice, requestModel);
-  }
-
-  getPDFFromHTML(value: any) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    };
-    const url = this.allapi.gethtmlToPdf;
-    return this.httpclient.post(url, value, httpOptions);
-  }
-
-  getDocFromHTML(value: any) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    };
-    const url = this.allapi.gethtmlToDoc;
-    return this.httpclient.post(url, value, httpOptions);
-  }
-
-  getRetrievedTickets(payload: any): Observable<any> {
-    const url = this.allapi.getRetrievedTicket;
-    return this.httpclient.post<any>(url, payload);
-  }
-
-  sendBookingConfirmPageEmail(model: any) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    };
-    return this.httpclient.post<any>(this.allapi.sendTicketinEmail, model, httpOptions);
-  }
-
-  addExtraServices(data: any): Observable<any> {
-    return this.httpclient.post(this.allapi.addExtraServices, data);
-  }
-
   getAirports(value: string) {
     const url = this.allapi.getCities + value;
     const headers = new HttpHeaders().set('skip-preloader', 'true');
     return this.httpclient.get(url, { headers });
   }
 
-  addAirSegment(data: any): Observable<any> {
-    return this.httpclient.post(this.allapi.addAirSegmentInfo, data);
-  }
-
   getAirlineList(value: string) {
     const url = this.allapi.getAirlinesName + value;
     const headers = new HttpHeaders().set('skip-preloader', 'true');
     return this.httpclient.get(url, { headers });
-  }
-
-  deleteSegmentInfo(payload: any) {
-    const url = this.allapi.deleteSegmentInfo;
-    return this.httpclient.post(url, payload);
   }
 
   sendResetPasswordRequest(email: string) {
@@ -243,7 +153,7 @@ export class AuthService {
     return this.httpclient.post(this.allapi.passwordResetConfirm, model, { headers });
   }
 
-  searchFlights(model: FlightSearchModel, journeyType: any): Observable<any> {
+  searchFlights(model: any, journeyType: any): Observable<any> {
     const headers = new HttpHeaders().set('skip-preloader', 'true');
     if (journeyType !== 3) {
       return this.httpclient.post<any>(this.allapi.flightSearch, model, { headers });
@@ -254,36 +164,5 @@ export class AuthService {
 
   agentChangePassword(payload: { ExistingPassword: string; NewPassword: string }): Observable<any> {
     return this.httpclient.post(this.allapi.passwordChange, payload);
-  }
-
-  createSubUser(data: any) {
-    if (data.isEditMode) {
-      data.isEditMode = undefined;
-      return this.httpclient.post(this.allapi?.updateSubUser, data);
-    }
-    data.isEditMode = undefined;
-    return this.httpclient.post(this.allapi?.createSubUser, data);
-  }
-
-  activeInactiveUser(data: any) {
-    return this.httpclient.post(this.allapi?.activeInactiveUser, data);
-  }
-
-  getAllSubUsers() {
-    return this.httpclient.get(this.allapi?.getAllSubUsers);
-  }
-
-  deleteSubUser(userId: number) {
-    return this.httpclient.post(this.allapi?.deleteSubUser, { Id: userId });
-  }
-
-  editTicketStatus(model) {
-    return this.httpclient.post(this.allapi.editTicketStatus, model);
-  }
-
-  getSubUserPermissions(subUserId) {
-    return this.httpclient.get(this.allapi.getSubUserPermissions, {
-      params: { subUserId },
-    });
   }
 }

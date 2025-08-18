@@ -30,7 +30,7 @@ export class AllApiService {
   getAirlinesName = this.baseURL + 'api/GetAirLinesBySearchString?SearchString=';
   forGotPassword = this.baseURL + 'ForgotPasswordRequest?UserName=';
   passwordResetConfirm = this.baseURL + 'PasswordReset';
-  flightSearch = this.baseURL + 'Etpir/AirSearch';
+  flightSearch = this.baseURL + 'flights/getFlightList';
   flightSearchMulti = this.baseURL + 'Etpir/AirSearchMulticity';
   passwordChange = this.baseURL + 'AgentChangePasswoed';
   createSubUser = this.baseURL + 'SubAgent/Create';

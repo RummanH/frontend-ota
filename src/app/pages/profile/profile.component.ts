@@ -135,13 +135,7 @@ export class ProfileComponent {
       confirmPassword: ['', Validators.required],
     });
 
-    this.authService.getCountryList().subscribe((data: any) => {
-      if (data.success === true) {
-        this.countries = data.payload;
-        this.authService.loadUserFromServer();
-        this.authService.loadUserPermissions();
-      }
-    });
+    this.authService.getCountryList().subscribe((data: any) => {});
 
     if (localStorage.getItem('isSubUser')) {
       this.isSubUser = this.encrDecr.getObject(localStorage.getItem('isSubUser'));
@@ -186,8 +180,6 @@ export class ProfileComponent {
             this.formStatus = 'success';
             // this.agencyForm.reset();
             this.showMessage('success', 'Success', response.Message || 'Registration Request Sent Successfully.');
-            this.authService.loadUserFromServer();
-            this.authService.loadUserPermissions();
             this.visible = false;
           } else {
             this.formStatus = 'idle';
@@ -239,8 +231,6 @@ export class ProfileComponent {
                   this.formStatus = 'success';
                   // this.agencyForm.reset();
                   this.showMessage('success', 'Success', response.Message || 'Registration Request Sent Successfully.');
-                  this.authService.loadUserFromServer();
-                  this.authService.loadUserPermissions();
                 } else {
                   this.formStatus = 'idle';
                   this.showMessage('error', 'Error', response.Message || 'Error In Registration Request.');
