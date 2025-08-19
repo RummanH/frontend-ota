@@ -9,7 +9,6 @@ import { ButtonModule } from 'primeng/button';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { AutoCompleteModule } from 'primeng/autocomplete';
 import { DatePickerModule } from 'primeng/datepicker';
 import { NgClickOutsideDirective } from 'ng-click-outside2';
 import { MessageService } from 'primeng/api';
@@ -24,6 +23,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import airlineLogos from 'airlogos';
 import { AuthService } from '../../../../core/services/auth.service';
+
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 @Component({
   selector: 'app-flight-list',
