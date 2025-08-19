@@ -7,8 +7,6 @@ import { SKIP_PRELOADER_HEADER_NAME } from '../../shared/constants';
 
 @Injectable()
 export class PreloaderInterceptor implements HttpInterceptor {
-  private requests: HttpRequest<any>[] = [];
-
   constructor(private preloaderService: PreloaderService) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
