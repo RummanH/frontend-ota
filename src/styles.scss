@@ -1,2 +1,193 @@
 @use 'tailwindcss';
 @use 'primeicons/primeicons.css';
+
+:root {
+  --rm-trip-brand: #2563eb;
+  --rm-trip-brand-dark: #1e40af;
+  --rm-trip-brand-light: #60a5fa;
+
+  --rm-trip-accent: #14b8a6;
+  --rm-trip-accent-dark: #0f766e;
+  --rm-trip-accent-light: #5eead4;
+
+  --rm-trip-highlight: #f59e0b;
+  --rm-trip-highlight-dark: #b45309;
+  --rm-trip-highlight-light: #fcd34d;
+
+  --rm-trip-surface: #f8f9fa;
+  --rm-trip-surface-muted: #e5e7eb;
+  --rm-trip-surface-card: #ffffff;
+
+  --rm-trip-text: #111827;
+  --rm-trip-text-muted: #6b7280;
+
+  --rm-trip-state-success: #16a34a;
+  --rm-trip-state-error: #dc2626;
+  --rm-trip-state-warm-triping: #f59e0b;
+
+  --rm-trip-font-heading: 'Poppins', sans-serif;
+  --rm-trip-font-body: 'Inter', sans-serif;
+
+  --rm-trip-h1: 2.25rem;
+  --rm-trip-h2: 1.75rem;
+  --rm-trip-h3: 1.5rem;
+  --rm-trip-body-lg: 1.125rem;
+  --rm-trip-body: 1rem;
+  --rm-trip-body-sm: 0.875rem;
+  --rm-trip-caption: 0.75rem;
+
+  --rm-trip-section: 2rem;
+  --rm-trip-card: 1.25rem;
+  --rm-trip-btn: 0.75rem;
+  --rm-trip-tight: 0.25rem;
+
+  --rm-trip-smooth: 0.75rem;
+  --rm-trip-pill: 9999px;
+
+  --rm-trip-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --rm-trip-lift-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --rm-trip-glow-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+}
+
+.text-rm-trip-brand {
+  color: var(--rm-trip-brand);
+}
+.text-rm-trip-accent {
+  color: var(--rm-trip-accent);
+}
+.text-rm-trip-highlight {
+  color: var(--rm-trip-highlight);
+}
+.text-rm-trip-text {
+  color: var(--rm-trip-text);
+}
+.text-rm-trip-text-muted {
+  color: var(--rm-trip-text-muted);
+}
+.text-rm-trip-success {
+  color: var(--rm-trip-state-success);
+}
+.text-rm-trip-error {
+  color: var(--rm-trip-state-error);
+}
+.text-rm-trip-warm-triping {
+  color: var(--rm-trip-state-warm-triping);
+}
+
+.bg-rm-trip-brand {
+  background-color: var(--rm-trip-brand);
+}
+
+.bg-rm-trip-brand:hover {
+  background-color: var(--rm-trip-brand-dark);
+}
+.bg-rm-trip-brand-dark {
+  background-color: var(--rm-trip-brand-dark);
+}
+.bg-rm-trip-accent {
+  background-color: var(--rm-trip-accent);
+}
+.bg-rm-trip-highlight {
+  background-color: var(--rm-trip-highlight);
+}
+.bg-rm-trip-surface {
+  background-color: var(--rm-trip-surface);
+}
+.bg-rm-trip-surface-muted {
+  background-color: var(--rm-trip-surface-muted);
+}
+.bg-rm-trip-surface-card {
+  background-color: var(--rm-trip-surface-card);
+}
+.bg-rm-trip-success {
+  background-color: var(--rm-trip-state-success);
+}
+.bg-rm-trip-error {
+  background-color: var(--rm-trip-state-error);
+}
+.bg-rm-trip-warm-triping {
+  background-color: var(--rm-trip-state-warm-triping);
+}
+
+.font-rm-trip-heading {
+  font-family: var(--rm-trip-font-heading);
+}
+.font-rm-trip-body {
+  font-family: var(--rm-trip-font-body);
+}
+
+.text-rm-trip-h1 {
+  font-size: var(--rm-trip-h1);
+}
+.text-rm-trip-h2 {
+  font-size: var(--rm-trip-h2);
+}
+.text-rm-trip-h3 {
+  font-size: var(--rm-trip-h3);
+}
+.text-rm-trip-body-lg {
+  font-size: var(--rm-trip-body-lg);
+}
+.text-rm-trip-body {
+  font-size: var(--rm-trip-body);
+}
+.text-rm-trip-body-sm {
+  font-size: var(--rm-trip-body-sm);
+}
+.text-rm-trip-caption {
+  font-size: var(--rm-trip-caption);
+}
+
+.p-rm-trip-section {
+  padding: var(--rm-trip-section);
+}
+.p-rm-trip-card {
+  padding: var(--rm-trip-card);
+}
+.p-rm-trip-btn {
+  padding: var(--rm-trip-btn);
+}
+.p-rm-trip-tight {
+  padding: var(--rm-trip-tight);
+}
+
+.m-rm-trip-section {
+  margin: var(--rm-trip-section);
+}
+.m-rm-trip-card {
+  margin: var(--rm-trip-card);
+}
+.m-rm-trip-btn {
+  margin: var(--rm-trip-btn);
+}
+.m-rm-trip-tight {
+  margin: var(--rm-trip-tight);
+}
+
+.rounded-rm-trip-smooth {
+  border-radius: var(--rm-trip-smooth);
+}
+.rounded-rm-trip-pill {
+  border-radius: var(--rm-trip-pill);
+}
+
+.shadow-rm-trip-card {
+  box-shadow: var(--rm-trip-card-shadow);
+}
+.shadow-rm-trip-lift {
+  box-shadow: var(--rm-trip-lift-shadow);
+}
+.shadow-rm-trip-glow {
+  box-shadow: var(--rm-trip-glow-shadow);
+}
+
+.focus-rm-trip-highlight:focus {
+  outline: none;
+  border-color: var(--rm-trip-highlight-light);
+  box-shadow: 0 0 0 2px var(--rm-trip-highlight-light);
+  transition: all 0.2s ease-in-out;
+}
+
+.border-rm-trip-accent-light {
+  border-color: var(--rm-trip-accent);
+}

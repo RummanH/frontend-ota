@@ -10,6 +10,7 @@ import { RippleModule } from 'primeng/ripple';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../../../core/services/auth.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 @Component({
   selector: 'app-login',
   imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, ReactiveFormsModule, FormsModule, CommonModule, ToastModule],

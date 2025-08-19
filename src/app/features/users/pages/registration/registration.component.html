@@ -1,41 +1,41 @@
-<div class="flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800 px-4">
+<div class="flex items-center justify-center min-h-screen w-full px-4 bg-cover bg-center bg-no-repeat bg-[linear-gradient(to_top,_rgba(245,247,250,0.95),_rgba(245,247,250,0.8)),url('assets/images/bg.svg')]">
   <p-toast></p-toast>
 
-  <div class="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 sm:p-10">
+  <div class="w-full max-w-lg bg-rm-trip-surface-card rounded-rm-trip-smooth shadow-rm-trip-glow p-8 sm:p-10">
     <div class="text-center mb-6">
-      <h2 class="text-3xl font-bold text-gray-700 mb-2">Account Registration</h2>
-      <p class="text-gray-600 dark:text-gray-300 text-sm font-semibold">Create your account to start booking flights</p>
+      <h2 class="text-rm-trip-h2 font-bold text-gray-700 mb-2">Account Registration</h2>
+      <p class="text-gray-600 text-sm font-semibold">Create your account to start booking flights</p>
     </div>
 
     <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="space-y-3">
       <div>
         <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
-        <input placeholder="example@mail.com" id="email" type="email" formControlName="email" autocomplete="off" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
-        <small class="text-red-500 text-xs" *ngIf="registrationForm.get('email')?.invalid && (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)"> Please enter a valid email </small>
+        <input placeholder="example@mail.com" id="email" type="email" formControlName="email" autocomplete="off" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
+        <small class="text-rm-trip-error text-xs" *ngIf="registrationForm.get('email')?.invalid && (registrationForm.get('email')?.dirty || registrationForm.get('email')?.touched)"> Please enter a valid email </small>
       </div>
 
       <div>
         <label for="phoneNumber" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone</label>
-        <input placeholder="017XXXXXXXXX" id="phoneNumber" type="tel" formControlName="phoneNumber" autocomplete="off" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
-        <small class="text-red-500 text-xs" *ngIf="registrationForm.get('phoneNumber')?.invalid && (registrationForm.get('phoneNumber')?.dirty || registrationForm.get('phoneNumber')?.touched)"> Please enter a valid phone number </small>
+        <input placeholder="017XXXXXXXXX" id="phoneNumber" type="tel" formControlName="phoneNumber" autocomplete="off" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
+        <small class="text-rm-trip-error text-xs" *ngIf="registrationForm.get('phoneNumber')?.invalid && (registrationForm.get('phoneNumber')?.dirty || registrationForm.get('phoneNumber')?.touched)"> Please enter a valid phone number </small>
       </div>
 
       <div>
         <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password</label>
-        <input placeholder="Your password" id="password" type="password" formControlName="password" autocomplete="new-password" class="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
-        <small class="text-red-500 text-xs" *ngIf="registrationForm.get('password')?.invalid && (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)"> Password must be at least 8 characters, include letters, numbers & a special character </small>
+        <input placeholder="Your password" id="password" type="password" formControlName="password" autocomplete="new-password" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
+        <small class="text-rm-trip-error text-xs" *ngIf="registrationForm.get('password')?.invalid && (registrationForm.get('password')?.dirty || registrationForm.get('password')?.touched)"> Password must be at least 8 characters, include letters, numbers & a special character </small>
       </div>
 
       <div>
-        <button type="submit" [disabled]="registrationForm.invalid || formStatus === 'loading'" class="w-full mt-4 flex items-center justify-center px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition disabled:opacity-70 disabled:cursor-not-allowed">
+        <button type="submit" [disabled]="registrationForm.invalid || formStatus === 'loading'" class="w-full bg-rm-trip-brand pointer text-white font-bold py-3 rounded-lg shadow-md transition disabled:opacity-70 disabled:cursor-not-allowed">
           <ng-container *ngIf="formStatus === 'loading'; else submitText"> <i class="pi pi-spin pi-spinner mr-2"></i> </ng-container>
           <ng-template #submitText>Register</ng-template>
         </button>
       </div>
 
       <div class="text-center mt-4">
-        <span class="text-gray-600 dark:text-gray-400 text-sm">Already have an account? </span>
-        <a [routerLink]="['/users/login']" class="text-red-600 font-semibold hover:underline">Login Now</a>
+        <span class="text-gray-600 text-sm font-semibold">Already have an account? </span>
+        <a [routerLink]="['/users/login']" class="text-rm-trip-highlight hover:underline font-medium">Login Now</a>
       </div>
     </form>
   </div>
