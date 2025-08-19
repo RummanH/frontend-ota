@@ -1,21 +1,20 @@
-import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { ApplicationConfig } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { PreloaderInterceptor } from './app/layout/service/preloader.interceptor';
-import { AuthInterceptor } from './app/layout/service/token-interceptor.service';
+import { AuthInterceptor } from './app/common-module/services/token-interceptor.service';
+import { PreloaderInterceptor } from './app/common-module/services/preloader.interceptor';
 
 export const appConfig: ApplicationConfig = {
-    providers: [
-        provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
-        provideHttpClient(withFetch(), withInterceptorsFromDi()),
-        // provideHttpClient(withInterceptors([tokenInterceptor])),
-        provideAnimationsAsync(),
-        providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: PreloaderInterceptor, multi: true },
-    ]
+  providers: [
+    provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    provideAnimationsAsync(),
+    providePrimeNG({ theme: { preset: Aura } }),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: PreloaderInterceptor, multi: true },
+  ],
 };

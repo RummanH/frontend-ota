@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { PreloaderComponent } from './app/layout/component/preloader/preloader.component';
+import { PreloaderComponent } from './app/common-module/component/preloader/preloader.component';
 
 @Component({
   selector: 'app-root',
