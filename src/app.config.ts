@@ -5,8 +5,8 @@ import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScroll
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { AuthInterceptor } from './app/common-module/services/token-interceptor.service';
-import { PreloaderInterceptor } from './app/common-module/services/preloader.interceptor';
+import { AuthInterceptor } from './app/core/services/token-interceptor.service';
+import { PreloaderInterceptor } from './app/core/services/preloader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
