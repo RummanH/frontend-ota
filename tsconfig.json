@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "strict": false,
+    "noImplicitAny": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
