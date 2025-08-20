@@ -36,22 +36,23 @@ export class RegistrationComponent {
     this.formStatus = 'loading';
 
     this.authService.registerUser(this.registrationForm.value).subscribe({
-      next: (response: any) => {
-        if (response.status) {
+      next: (res: any) => {
+        if (res.success) {
           this.formStatus = 'success';
           this.registrationForm.reset();
-          this.showMessage('success', 'Request Sent', 'Your registration request has been sent successfully.');
+          this.showMessage('success', 'Request Sent', res.message);
           setTimeout(() => {
-            this.router.navigate(['/auth/login']);
+            this.router.navigate(['/users/login']);
           }, 3000);
         } else {
           this.formStatus = 'idle';
-          this.showMessage('error', 'Registration Error', response?.message || 'There was an error processing your registration request.');
+          this.showMessage('error', 'Registration Error', res.message || 'There was an error processing your registration request.');
         }
       },
       error: (err) => {
         this.formStatus = 'idle';
         console.error('HTTP Error:', err);
+        this.showMessage('error', 'Registration Error', err.error.message || 'There was an error processing your registration request.');
       },
     });
   }

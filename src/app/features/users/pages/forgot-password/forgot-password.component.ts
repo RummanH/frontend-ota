@@ -39,20 +39,20 @@ export class ForgotPasswordComponent {
     const email = this.forgotForm.value.email;
 
     this.authService.sendResetPasswordRequest(email).subscribe({
-      next: (response: any) => {
-        if (response.success) {
+      next: (res: any) => {
+        if (res.success) {
           this.formStatus = 'success';
-          this.resetPasswordMessage = response?.message;
+          this.resetPasswordMessage = res?.message;
           this.forgotForm.reset();
-          this.showMessage('success', 'Reset Email Sent', response?.message || `A password reset link has been sent to your registered email. Please check your inbox.`);
+          this.showMessage('success', 'Reset Email Sent', res?.message || `A password reset link has been sent to your registered email. Please check your inbox.`);
         } else {
           this.formStatus = 'error';
-          this.showMessage('error', 'Reset Failed', response?.message || `We couldn’t send the reset email. Please ensure the PCC is correct and try again.`);
+          this.showMessage('error', 'Reset Failed', res?.message || `We couldn’t send the reset email. Please ensure the PCC is correct and try again.`);
         }
       },
       error: (err) => {
         this.formStatus = 'error';
-        this.showMessage('error', 'Reset Failed', `We couldn’t send the reset email. Please ensure that the email settings are properly configured.`);
+        this.showMessage('error', 'Reset Failed', err.error.message || `We couldn’t send the reset email. Please ensure that the email settings are properly configured.`);
       },
     });
   }

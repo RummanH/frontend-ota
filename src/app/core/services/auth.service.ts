@@ -143,12 +143,11 @@ export class AuthService {
   }
 
   sendResetPasswordRequest(email: string) {
-    const url = this.allapi.forGotPassword + encodeURIComponent(email);
     const headers = new HttpHeaders().set('skip-preloader', 'true');
-    return this.httpclient.get(url, { headers });
+    return this.httpclient.post(this.allapi.forGotPassword, { email }, { headers });
   }
 
-  resetPassword(model: { NewPassword: string; OTP: string }) {
+  resetPassword(model: { password: string; token: string }) {
     const headers = new HttpHeaders().set('skip-preloader', 'true');
     return this.httpclient.post(this.allapi.passwordResetConfirm, model, { headers });
   }

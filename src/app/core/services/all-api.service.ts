@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class AllApiService {
-  baseURL = 'http://localhost:3001/';
+  baseURL = 'https://ota-hrz4.onrender.com/';
 
   countryList = this.baseURL + 'CountryDDL';
   cityList = this.baseURL + 'CityDDL?CountryID=';
@@ -28,8 +28,8 @@ export class AllApiService {
   addAirSegmentInfo = this.baseURL + 'AddAirSegmentInfo';
   deleteSegmentInfo = this.baseURL + 'DeleteSegmentInfo';
   getAirlinesName = this.baseURL + 'api/GetAirLinesBySearchString?SearchString=';
-  forGotPassword = this.baseURL + 'ForgotPasswordRequest?UserName=';
-  passwordResetConfirm = this.baseURL + 'PasswordReset';
+  forGotPassword = this.baseURL + 'users/forgotPassword';
+  passwordResetConfirm = this.baseURL + 'users/resetPassword';
   flightSearch = this.baseURL + 'flights/getFlightList';
   flightSearchMulti = this.baseURL + 'Etpir/AirSearchMulticity';
   passwordChange = this.baseURL + 'AgentChangePasswoed';

@@ -22,10 +22,10 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class ResetPasswordComponent {
   resetForm: FormGroup;
   formStatus: 'idle' | 'loading' | 'success' = 'idle';
-  otp = '';
 
   private authService = inject(AuthService);
   private messageService = inject(MessageService);
+  token;
 
   constructor(
     private fb: FormBuilder,
@@ -34,8 +34,8 @@ export class ResetPasswordComponent {
   ) {
     this.resetForm = this.fb.group(
       {
-        Password: ['', [Validators.required, Validators.pattern('^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$')]],
-        ConfirmPassword: ['', Validators.required],
+        password: ['', Validators.required],
+        confirmPassword: ['', Validators.required],
       },
       { validators: this.passwordMatchValidator },
     );
@@ -43,23 +43,21 @@ export class ResetPasswordComponent {
 
   ngOnInit() {
     this.activatedRoute.params.subscribe((params: any) => {
-      console.log(params);
-      this.otp = params.rcode;
+      console.log(params)
+      this.token = params.code;
     });
   }
 
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
-    const password = form.get('Password')?.value;
-    const confirmPassword = form.get('ConfirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
+    return form.get('password')?.value === form.get('confirmPassword')?.value ? null : { mismatch: true };
   }
 
   get password() {
-    return this.resetForm.get('Password')!;
+    return this.resetForm.get('password')!;
   }
 
   get confirmPassword() {
-    return this.resetForm.get('ConfirmPassword')!;
+    return this.resetForm.get('confirmPassword')!;
   }
 
   onSubmit() {
@@ -67,31 +65,30 @@ export class ResetPasswordComponent {
 
     this.formStatus = 'loading';
 
-    const password = this.resetForm.value.Password;
-    const otp = this.otp;
+    const password = this.resetForm.value.password;
 
     const model = {
-      NewPassword: password,
-      OTP: otp,
+      password,
+      token: this.token,
     };
 
     this.authService.resetPassword(model).subscribe({
-      next: (response: any) => {
-        if (response.Success) {
+      next: (res: any) => {
+        if (res.success) {
           this.formStatus = 'success';
-          this.showMessage('success', 'Password Reset Successful', 'Your password has been reset successfully.');
+          this.showMessage('success', 'Password Reset Successful', res.message || 'Your password has been reset successfully.');
 
           setTimeout(() => {
-            this.router.navigate(['/auth/login']);
+            this.router.navigate(['/users/login']);
           }, 3000);
         } else {
           this.formStatus = 'idle';
-          this.showMessage('error', 'Reset Failed', 'Could not reset your password. Please verify your inputs and try again.');
+          this.showMessage('error', 'Reset Failed', res.message || 'Could not reset your password. Please verify your inputs and try again.');
         }
       },
       error: (err) => {
         this.formStatus = 'idle';
-        this.showMessage('error', 'Reset Failed', 'An error occurred while resetting your password. Please try again.');
+        this.showMessage('error', 'Reset Failed', err.error.message || 'An error occurred while resetting your password. Please try again.');
         console.error('Password reset error:', err);
       },
     });
