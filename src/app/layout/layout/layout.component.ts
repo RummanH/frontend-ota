@@ -1,14 +1,14 @@
 import { Component, Renderer2, ViewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { TopbarComponent } from '../topbar/topbar.component';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../footer/footer.component';
 import { LayoutService } from '../../core/services/layout.service';
+import { TopBarComponent } from '../topbar/topbar.component';
 
 @Component({
   selector: 'app-layout',
-  imports: [CommonModule, FooterComponent, RouterOutlet, TopbarComponent],
+  imports: [CommonModule, FooterComponent, RouterOutlet, TopBarComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
 })
@@ -17,7 +17,7 @@ export class LayoutComponent {
 
   menuOutsideClickListener: any;
 
-  @ViewChild(TopbarComponent) appTopBar!: TopbarComponent;
+  @ViewChild(TopBarComponent) appTopBar!: TopBarComponent;
 
   constructor(
     public layoutService: LayoutService,
@@ -74,16 +74,6 @@ export class LayoutComponent {
     } else {
       document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
     }
-  }
-
-  get containerClass() {
-    return {
-      'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay',
-      'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
-      'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
-      'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
-      'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive,
-    };
   }
 
   ngOnDestroy() {

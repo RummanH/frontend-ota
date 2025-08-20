@@ -1,43 +1,45 @@
-<div class="flex items-center justify-center min-h-screen w-full px-4 bg-cover bg-center bg-no-repeat bg-[linear-gradient(to_top,_rgba(245,247,250,0.95),_rgba(245,247,250,0.8)),url('assets/images/bg.svg')]">
-  <p-toast />
+<div class="bg-cover bg-center bg-no-repeat bg-[linear-gradient(to_top,_rgba(245,247,250,0.95),_rgba(245,247,250,0.8)),url('assets/images/bg.svg')]">
+  <div class="min-h-screen container flex items-center justify-center">
+    <p-toast />
 
-  <div class="w-full max-w-lg bg-rm-trip-surface-card rounded-rm-trip-smooth shadow-rm-trip-glow p-8 sm:p-10">
-    <div class="text-center mb-6">
-      <h2 class="text-rm-trip-h2 font-bold text-gray-700 mb-2">Sign In to Your Account</h2>
-      <p class="text-gray-600 text-sm font-semibold">Access your account by signing in below</p>
-    </div>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-3">
-      <div>
-        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-        <input placeholder="example@mail.com" id="email" type="text" formControlName="email" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
-        <small *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-rm-trip-error show text-xs"> Please provide valid email! </small>
+    <div class="w-full max-w-lg bg-rm-trip-surface-card rounded-rm-trip-smooth shadow-rm-trip-glow p-8 sm:p-10">
+      <div class="text-center mb-6">
+        <h2 class="text-rm-trip-h2 font-bold text-gray-700 mb-2">Sign In to Your Account</h2>
+        <p class="text-gray-600 text-sm font-semibold">Access your account by signing in below</p>
       </div>
 
-      <div>
-        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-        <input placeholder="Your password" type="password" id="password" formControlName="password" class="w-full" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
-
-        <div class="flex justify-between items-center mt-2 text-sm">
-          <small *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-rm-trip-error text-xs"> Password is required. </small>
-          <a [routerLink]="['/users/forgot-password']" class="text-rm-trip-highlight hover:underline font-medium">Forgot Password?</a>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-3">
+        <div>
+          <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+          <input placeholder="example@mail.com" id="email" type="text" formControlName="email" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
+          <small *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-rm-trip-error show text-xs"> Please provide valid email! </small>
         </div>
-      </div>
 
-      <button type="submit" [disabled]="formStatus === 'loading' || loginForm.invalid" class="w-full bg-rm-trip-brand pointer text-white font-bold py-3 rounded-lg shadow-md transition disabled:opacity-70 disabled:cursor-not-allowed">
-        <ng-container *ngIf="formStatus === 'loading'; else notLoading"> <i class="pi pi-spin pi-spinner mr-2"></i> </ng-container>
-        <ng-template #notLoading>
-          <ng-container *ngIf="formStatus === 'success'; else defaultLabel"> <i class="pi pi-check mr-2"></i> Success </ng-container>
-          <ng-template #defaultLabel>
-            <span>Sign In</span>
+        <div>
+          <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+          <input placeholder="Your password" type="password" id="password" formControlName="password" class="w-full" class="w-full rounded-lg border border-rm-trip-accent-light px-4 py-3 text-gray-900 bg-white focus-rm-trip-highlight" />
+
+          <div class="flex justify-between items-center mt-2 text-sm">
+            <small *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-rm-trip-error text-xs"> Password is required. </small>
+            <a [routerLink]="['/users/forgot-password']" class="text-rm-trip-highlight hover:underline font-medium">Forgot Password?</a>
+          </div>
+        </div>
+
+        <button type="submit" [disabled]="formStatus === 'loading' || loginForm.invalid" class="w-full bg-rm-trip-brand pointer text-white font-bold py-3 rounded-lg shadow-md transition disabled:opacity-70 disabled:cursor-not-allowed">
+          <ng-container *ngIf="formStatus === 'loading'; else notLoading"> <i class="pi pi-spin pi-spinner mr-2"></i> </ng-container>
+          <ng-template #notLoading>
+            <ng-container *ngIf="formStatus === 'success'; else defaultLabel"> <i class="pi pi-check mr-2"></i> Success </ng-container>
+            <ng-template #defaultLabel>
+              <span>Sign In</span>
+            </ng-template>
           </ng-template>
-        </ng-template>
-      </button>
+        </button>
 
-      <div class="text-center mt-4">
-        <span class="text-gray-600 text-sm font-semibold">Don’t have an account? </span>
-        <a [routerLink]="['/users/registration']" class="text-rm-trip-highlight font-semibold hover:underline">Register</a>
-      </div>
-    </form>
+        <div class="text-center mt-4">
+          <span class="text-gray-600 text-sm font-semibold">Don’t have an account? </span>
+          <a [routerLink]="['/users/registration']" class="text-rm-trip-highlight font-semibold hover:underline">Register</a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

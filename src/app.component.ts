@@ -6,9 +6,9 @@ import { PreloaderComponent } from './app/shared/components/preloader/preloader.
   selector: 'app-root',
   standalone: true,
   imports: [RouterModule, PreloaderComponent],
-  template: `<div>
+  template: `<ng-container>
     <router-outlet></router-outlet>
     <app-preloader />
-  </div>`,
+  </ng-container>`,
 })
 export class AppComponent {}
